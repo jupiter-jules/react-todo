@@ -6,11 +6,12 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Container from 'react-bootstrap/Container';
 import CloseButton from 'react-bootstrap/CloseButton';
 import ListGroup from 'react-bootstrap/ListGroup';
+import useLocalStorage from '../src/useLocalStorage';
 
 import './App.css';
 
 export default function App() {
-  const [todos, setTodos] = React.useState([
+  const [todos, setTodos] = useLocalStorage('todos',[
     { id: 1, text: "Write down everything you need to do", done: false },
     { id: 2, text: "Break daunting tasks into manageable pieces", done: false },
     { id: 3, text: "Keep it short and simple", done: false }
@@ -34,7 +35,7 @@ const openTodosCount = openTodos.length;
             fontWeight: "200",
           }}>to go</span></h1>
         <p class="lead">"Nothing is particularly hard if you break it down into small jobs."</p>
-      </div>   
+      </div>
       <TodoList setTodos={setTodos} todos={todos} />
       <AddTodo setTodos={setTodos} />
       </Container>
@@ -52,11 +53,12 @@ function TodoList({ todos, setTodos }) {
           }
         : t
     );
+    updatedTodos.sort((x, y) => x.done - y.done);
     setTodos(updatedTodos);
   }
 
   if (!todos.length) {
-    return <p>No todos left!</p>;
+    return <p>Yay, no tasks left!</p>;
   }
 
   return (
@@ -75,7 +77,7 @@ function TodoList({ todos, setTodos }) {
           }}
           key={todo.id}
         >
-          <input type="checkbox" aria-label="Checkbox for following text input" name="done"
+          <input type="checkbox" checked ={todo.done} aria-label="Checkbox for following text input" name="done"
           onClick={() => handleToggleTodo(todo)}
           style={{
             marginRight: "1em"
@@ -92,12 +94,9 @@ function TodoList({ todos, setTodos }) {
 
 function DeleteTodo({ todo, setTodos }) {
   function handleDeleteTodo() {
-    const confirmed = window.confirm("Do you want to delete this?");
-    if (confirmed) {
       setTodos((prevTodos) => {
         return prevTodos.filter((t) => t.id !== todo.id);
       });
-    }
   }
 
   return (
